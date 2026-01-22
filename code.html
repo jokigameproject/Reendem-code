@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Redeem Code</title>
+<style>
+body {
+    font-family: Arial;
+    background: #f2f2f2;
+    padding: 20px;
+}
+.box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: auto;
+    margin-bottom: 20px;
+}
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+.notif {
+    background: #eee;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+.hapus {
+    background: red;
+    margin-top: 5px;
+}
+#adminPanel {
+    display: none;
+}
+</style>
+</head>
+<body>
+
+<h1>Rendeem Code For : Joki Game</h1>
+
+<!-- REDEEM -->
+<div class="box">
+<h2>Redeem Code</h2>
+
+<!-- TAMBAHAN NAMA -->
+<input type="text" id="nama" placeholder="Your Name">
+
+<input type="text" id="code" placeholder="Code here">
+<button onclick="redeem()">Redeem Code</button>
+<p id="hasil"></p>
+</div>
+
+<h1>Admin Area</h1>
+
+<!-- ADMIN -->
+<div class="box">
+<h2>Admin Panel</h2>
+<button onclick="loginAdmin()">Masuk Admin</button>
+<h6>System by : Bryan</h6>
+
+<div id="adminPanel">
+<h3>Notifikasi</h3>
+<div id="notifList"></div>
+</div>
+</div>
+
+<h3>Royal Pekan Team :3 x Joki Game</h3>
+<h4>@2026 Github, Web</h4>
+
+<script>
+// =====================
+// KONFIGURASI
+// =====================
+const PASSWORD_ADMIN = "bryan1507";
+
+const KODE_SPESIAL = [
+  "HP22RYZI4213",
+  "TXTZFGHI5785",
+  "XONWNKIS2973",
+  "AJDBSIND4581",
+  "AKEHAJBS7236",
+  "AKBDAOJEJ9263",
+  "KSBIDISN2737",
+  "JOVANMAUHADIAH",
+  "PROMOANDY"
+];
+
+// =====================
+// REDEEM
+// =====================
+function redeem() {
+    let nama = document.getElementById("nama").value.trim();
+    let kode = document.getElementById("code").value.trim();
+
+    if (nama === "") {
+        alert("Please Enter Your Name");
+        return;
+    }
+
+    // TAMBAHAN: NAMA TIDAK BOLEH ANGKA
+    if (/\d/.test(nama)) {
+        alert("Name cannot contain numbers");
+        return;
+    }
+
+    if (kode === "") {
+        alert("Please Enter The Code");
+        return;
+    }
+
+    let usedCodes = JSON.parse(localStorage.getItem("usedCodes")) || [];
+
+    if (usedCodes.includes(kode)) {
+        document.getElementById("hasil").innerText = "Code Already Use ❌";
+        return;
+    }
+
+    if (KODE_SPESIAL.includes(kode)) {
+        usedCodes.push(kode);
+        localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+
+        // TAMBAHAN FORMAT NOTIF
+        let notif = {
+            pesan: `${nama} mereendem kode (${kode})`,
+            waktu: new Date().toLocaleString()
+        };
+
+        let notifData = JSON.parse(localStorage.getItem("notif")) || [];
+        notifData.push(notif);
+        localStorage.setItem("notif", JSON.stringify(notifData));
+
+        document.getElementById("hasil").innerText = "Redeem berhasil ✅";
+
+        document.getElementById("nama").value = "";
+        document.getElementById("code").value = "";
+    } else {
+        document.getElementById("hasil").innerText = "Code Doent's Exits ❌";
+    }
+}
+
+// =====================
+// ADMIN LOGIN
+// =====================
+function loginAdmin() {
+    let pass = prompt("Masukkan password admin:");
+    if (pass === PASSWORD_ADMIN) {
+        document.getElementById("adminPanel").style.display = "block";
+        tampilNotif();
+        alert("Welcome!");
+    } else {
+        alert("Wrong Password");
+    }
+}
+
+// =====================
+// TAMPIL NOTIF
+// =====================
+function tampilNotif() {
+    let list = document.getElementById("notifList");
+    list.innerHTML = "";
+    let data = JSON.parse(localStorage.getItem("notif")) || [];
+
+    if (data.length === 0) {
+        list.innerHTML = "<p>Tidak ada notifikasi</p>";
+        return;
+    }
+
+    data.forEach((n, i) => {
+        let div = document.createElement("div");
+        div.className = "notif";
+        div.innerHTML = `
+            <b>${n.pesan}</b><br>
+            <small>${n.waktu}</small>
+            <button class="hapus" onclick="hapusNotif(${i})">Hapus</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+// =====================
+// HAPUS NOTIF
+// =====================
+function hapusNotif(index) {
+    let data = JSON.parse(localStorage.getItem("notif")) || [];
+    data.splice(index, 1);
+    localStorage.setItem("notif", JSON.stringify(data));
+    tampilNotif();
+}
+</script>
+
+</body>
+</html>
